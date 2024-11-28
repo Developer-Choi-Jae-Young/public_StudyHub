@@ -1,11 +1,21 @@
 pipeline{
     agent any
     stages{
+       stage('Prepare'){
+            steps {
+                sh 'cd studyhub && ./gradlew clean'
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'cd studyhub && ./gradlew build'
+            }
+        }
         stage('Deploy Prepare Check Running Container'){
             steps{
                  script {
                     // Docker 컨테이너의 이름 또는 ID
-                    def containerName = 'final-react-app'
+                    def containerName = 'final-spring-app'
 
                     // Docker 컨테이너가 가동 중인지 확인
                     def result = sh(script: "docker ps -q -f name=${containerName}", returnStdout: true).trim()
@@ -20,7 +30,7 @@ pipeline{
             steps {
                 script {
                     // Docker 컨테이너의 이름 또는 ID
-                    def containerName = 'final-react-app'
+                    def containerName = 'final-spring-app'
 
                     // 모든 Docker 컨테이너 목록을 가져와서 해당 컨테이너가 존재하는지 확인
                     def result = sh(script: "docker ps -a -q -f name=${containerName}", returnStdout: true).trim()
@@ -35,7 +45,7 @@ pipeline{
             steps {
                 script {
                     // 확인할 Docker 이미지의 이름과 태그
-                    def imageName = 'final-react-image'
+                    def imageName = 'final-spring-image'
                     def imageId
 
                     // Docker 이미지의 전체 이름 (이름과 태그)
@@ -56,7 +66,7 @@ pipeline{
                     // Dockerfile이 위치한 디렉토리 (Dockerfile 경로)
                     def dockerfileDir = 'studyhub'
                     // 빌드할 Docker 이미지의 이름과 태그
-                    def imageName = 'final-react-image'
+                    def imageName = 'final-spring-image'
                     def imageFullName = "${imageName}"
 
                     // Docker 이미지 빌드
@@ -72,9 +82,9 @@ pipeline{
             steps {
                 script {
                    // 컨테이너의 이름
-                    def containerName = 'final-react-app'
+                    def containerName = 'final-spring-app'
                     // Docker 이미지 이름과 태그
-                    def imageName = 'final-react-image'
+                    def imageName = 'final-spring-image'
                     def imageFullName = "${imageName}"
 
                     // Docker 컨테이너를 실행하기 전에 컨테이너가 이미 존재하는지 확인하고 삭제
@@ -88,7 +98,7 @@ pipeline{
                     
                     // Docker 컨테이너 실행
                     echo "Starting Docker container '${containerName}' from image '${imageFullName}'..."
-                    sh "docker run -d -e TZ=Asia/Seoul -p 500:443 --name ${containerName} ${imageFullName}"
+                    sh "docker run -d -e TZ=Asia/Seoul -p 3131:8443 --name ${containerName} ${imageFullName}"
 
                     // 컨테이너 상태 확인
                     def containerId = sh(script: "docker ps -q -f name=${containerName}", returnStdout: true).trim()
